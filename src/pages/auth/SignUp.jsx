@@ -1,9 +1,35 @@
-import React from 'react';
+import React, {useState} from 'react';
 import logo from '../../assets/logo.png';
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
+import { Link } from 'react-router-dom';
+import { useAuthContext } from '../../context/AuthContext';
+import LoadButton from '../../components/loaders/LoadButton';
+
+const initialFormData = Object.freeze({
+  name: '',
+  email: '',
+  password: '',
+  password2: '',
+})
 
 const SignUp = () => {
+  const [formData, updateFormData] = useState(initialFormData);
+  let {signUp, loading} = useAuthContext()
+
+  const handleChange = (e) =>{
+    updateFormData({
+      ...formData,
+      //Trimming any whitespace
+      [e.target.name]: e.target.value.trim(),
+    });
+  };
+
+  const handleSubmit = (e) =>{
+    e.preventDefault()
+    signUp(formData)
+  }
+
   return (
     <section className='p-6'>
       <div className='w-full flex justify-center'>
@@ -11,27 +37,33 @@ const SignUp = () => {
       </div>
       <div id='form-container' className='w-5/6 mt-8 mx-auto'>
         <h3 className='text-xl font-medium'>Sign up</h3>
-        <p className='mt-2 text-sm py-1'>Already have an account? <span className='ml-1 text-[#43A047] border-b-2 border-[#43A047]'>Sign In Now</span></p>
+        <p className='mt-2 text-sm py-1'>Already have an account? <Link to="/auth/signin" className='ml-1 text-[#43A047] border-b-2 border-[#43A047]'>Sign In Now</Link></p>
         <div id='form-body' className='mt-4 w-full mx-auto'>
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className='mb-3 flex flex-col'>
               <label className='text-sm mb-3 font-medium' htmlFor="name">Full Name</label>
-              <input className='p-1 border border-gray-300 text-sm rounded-md focus:outline-[#43A047]' type="text" name="name" required/>
+              <input className='p-1 border border-gray-300 text-sm rounded-md focus:outline-[#43A047]' type="text" name="name" onChange={handleChange} required/>
             </div>
             <div className='mb-3 flex flex-col'>
               <label className='text-sm mb-3 font-medium' htmlFor="email">Email Address</label>
-              <input className='p-1 border border-gray-300 text-sm rounded-md focus:outline-[#43A047]' type="email" name="email" required/>
+              <input className='p-1 border border-gray-300 text-sm rounded-md focus:outline-[#43A047]' type="email" name="email" onChange={handleChange} required/>
             </div>
             <div className='mb-3 flex flex-col'>
               <label className='text-sm mb-3 font-medium' htmlFor="password">Create Password</label>
-              <input className='p-1 border border-gray-300 text-sm rounded-md focus:outline-[#43A047]' type="password" name="password" required/>
+              <input className='p-1 border border-gray-300 text-sm rounded-md focus:outline-[#43A047]' type="password" name="password" onChange={handleChange} required/>
             </div>
             <div className='mb-3 flex flex-col'>
               <label className='text-sm mb-3 font-medium' htmlFor="password">Confirm Password</label>
-              <input className='p-1 border border-gray-300 text-sm rounded-md focus:outline-[#43A047]' type="password" name="password2" required/>
+              <input className='p-1 border border-gray-300 text-sm rounded-md focus:outline-[#43A047]' type="password" name="password2" onChange={handleChange} required/>
             </div>
             <div>
-              <button className='w-full bg-[#43A047] py-2 text-sm text-white rounded-tr-md rounded-bl-md hover:bg-[#81ca84] hover:tracking-widest' type="submit">Sign up</button>
+              {
+                !loading ? (
+                  <button className='w-full bg-[#43A047] py-2 text-sm text-white rounded-tr-md rounded-bl-md hover:bg-[#81ca84] hover:tracking-widest' type="submit">Sign Up</button>
+                ) : (
+                  <LoadButton buttonTxt="Signing Up ....."/>
+                )
+              }
             </div>
           </form>
             <div id='social-login' className='mt-4'>
